@@ -79,6 +79,8 @@ def get_soup(data):
 
 # 获取参数
 book = sys.argv[1]
+if book[-1] != '/':
+    book += '/'
 
 page_inter = 1
 if len(sys.argv) > 2:

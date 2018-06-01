@@ -37,4 +37,8 @@ mv ../archives/"${zipname}" /home/chen/www/dotomato_home/e/
 echo ""
 echo "======================================================================="
 echo "Please download at:"
+echo ""
+echo ""
 echo "https://www.dotomato.top/e/${zipname}"
+echo ""
+echo ""
