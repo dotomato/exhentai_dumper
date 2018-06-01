@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [ $# != 1 ]; then
+	echo "Usage: exdumper URL (https://exhentai.org/g/xxxx/xxxx)"
+	exit 0
+fi
+
+
+if [[ ! -d "data" ]]; then
+	mkdir data
+fi 
+
+
+if [[ ! -d "archives" ]]; then
+	mkdir archives
+fi
+
+
+if [[ ! -f "count" ]]; then
+	touch count
+	echo 0000 > count
+fi
+
+
+export LANGUAGE="zh_CN:zh:en_US:en"
+export LC_ALL="zh_CN.UTF-8"
+export LANG="zh_CN.UTF-8"
+cd /home/chen/projects/exhentai_dumper
+python3 main10.py $1
+dataname=$(ls -t data/ |awk 'NR==1{print}')
+zipname=$(cat count).zip
+echo "ziping $dataname"
+cd data
+zip -r0 ../archives/"${zipname}" "${dataname}"/
+rm -r /home/chen/projects/exhentai_dumper/data/*
+mv ../archives/"${zipname}" /home/chen/www/dotomato_home/e/
+echo ""
+echo "======================================================================="
+echo "Please download at:"
+echo "https://www.dotomato.top/e/${zipname}"
