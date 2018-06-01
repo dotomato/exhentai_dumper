@@ -95,7 +95,7 @@ print('========================================================')
 print('getting:' + book)
 book_soup = get_soup(get_html(book))
 
-title = book_soup.find('h1', attrs={'id': 'gj'}).text
+title = book_soup.find('h1', attrs={'id': 'gn'}).text
 if title is None or title == '':
     title = 'exhentai'
 else:
