@@ -56,12 +56,12 @@ else:
     cookie_aff.save(cookie_filename, ignore_discard=True, ignore_expires=True)
     print('save cookie success')
 
-
 # 获取计数
 count = 0
 with open('count', 'r') as f:
-	count = int(f.readline())
+    count = int(f.readline())
 count += 1
+
 
 def get_html(url):
     req = request.Request(url, headers=headers)
@@ -77,17 +77,25 @@ def get_soup(data):
     return BeautifulSoup(data, 'html.parser')
 
 
-print('========================================================')
-# 开主页
+# 获取参数
 book = sys.argv[1]
 
-print('getting:'+book)
+page_inter = 1
+if len(sys.argv) > 2:
+    page_inter = int(sys.argv[2])
+
+page_stop = -1
+if len(sys.argv) > 3:
+    page_stop = int(sys.argv[3])
+
+# 获取第一页
+print('========================================================')
+print('getting:' + book)
 book_soup = get_soup(get_html(book))
-print('get html finished')
 
 title = book_soup.find('h1', attrs={'id': 'gj'}).text
-if title is None or title=='':
-    title='exhentai'
+if title is None or title == '':
+    title = 'exhentai'
 else:
     print(title)
     title = re.sub(r'[\\/:*?"<>|]', '-', title)
@@ -96,26 +104,50 @@ book_path = os.path.join('data', title)
 if not os.path.exists(book_path):
     os.mkdir(book_path)
 
-pages = [i.div.a['href'] for i in book_soup.find_all('div', attrs={'class': 'gdtm'})]
+page_count = book_soup.find_all('td', attrs={'class': 'gdt2'})[5]
+page_count = page_count.text.split(' ')[0]
+page_count = int(page_count) // 40 + 1
+print('page count:', page_count)
+
+if page_stop != -1:
+    page_count = min(page_stop, page_count)
+
+pages_0 = [i.div.a['href'] for i in book_soup.find_all('div', attrs={'class': 'gdtm'})]
+page_c = 0
+
+
+def deal_pages(pages):
+    global page_c
+    while page_c < len(pages):
+        page = pages[page_c]
+        print('========================================================')
+        print('getting:' + page)
+        page_soup = get_soup(get_html(page))
+        img = page_soup.find('div', attrs={'id': 'i3'}).a.img['src']
+        img_name = img.split('/')[-1]
+
+        print('getting:' + img)
+        img_data = get_data(img)
+        img_path = os.path.join('data', title, img_name)
+        f = open(img_path, 'wb')
+        f.write(img_data)
+        f.flush()
+        f.close()
+        page_c += page_inter
+    page_c -= len(pages)
+
+deal_pages(pages_0)
+
+if page_count > 1:
+    for i in range(1, page_count):
+        book_i = book+'?p={}'.format(i)
+        print('getting:' + book_i)
+        book_soup = get_soup(get_html(book_i))
+        pages_i = [i.div.a['href'] for i in book_soup.find_all('div', attrs={'class': 'gdtm'})]
+        deal_pages(pages_i)
 
 print('========================================================')
-for i, page in enumerate(pages):
-    print('getting:'+page)
-    page_soup = get_soup(get_html(page))
-    img = page_soup.find('div', attrs={'id': 'i3'}).a.img['src']
-    img_name = "{:03d}-".format(i) + img.split('/')[-1]
-
-    print('getting:'+img)
-    img_data = get_data(img)
-    img_path = os.path.join('data', title, img_name)
-    f = open(img_path, 'wb')
-    f.write(img_data)
-    f.flush()
-    f.close()
-    print('========================================================')
-
 print('finish!!!')
 with open('count', 'w') as f:
-	f.write("{:04d}".format(count))
-	f.flush()
-
+    f.write("{:04d}".format(count))
+    f.flush()
