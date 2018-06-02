@@ -100,7 +100,7 @@ if title is None or title == '':
     title = 'exhentai'
 else:
     print(title)
-    title = re.sub(r'[\\/:*?\"<>| \-]', '-', title)
+    title = re.sub(r'[\\/:*?\"<>| \-]', '', title)
 
 book_path = os.path.join('data', title)
 if not os.path.exists(book_path):
