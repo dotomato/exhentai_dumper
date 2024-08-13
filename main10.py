@@ -7,8 +7,8 @@ import http.cookiejar
 from bs4 import BeautifulSoup
 import re
 
-username = 'dotomato'
-password = '369258147'
+username = 'xxxxxxxxx'
+password = 'xxxxxxxxx'
 
 # 初始化
 user_agent = r'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36' \
